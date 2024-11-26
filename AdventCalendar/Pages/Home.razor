@@ -34,12 +34,36 @@
             dayClass += " saturday";
         }
 
-        <div class="@dayClass">
-            <span>@day</span>
-            <div class="calendar-content">
-                <a class="how-to-contribute" href="https://github.com/igjp-sample/AdventCalendar/blob/main/how_to_contribute_article.md" target="_blank">+</a>
+        if (articles.ContainsKey(day))
+        {
+            var article = articles[day];
+            <div class="@dayClass">
+                <span>@day</span>
+                <div class="calendar-content has-post">
+                    <b>
+                        @if (article.Status == "Publish")
+                        {
+                            <a href="">@article.Title</a>
+                        }
+                        else
+                        {
+                            @article.Title
+                        }
+                    </b>
+                    <i>by <a href="https://github.com/@article.Author" target="_blank">@@@article.Author</a></i>
+                </div>
             </div>
-        </div>
+        }
+        else
+        {
+            <div class="@dayClass">
+                <span>@day</span>
+                <div class="calendar-content">
+                    <a class="how-to-contribute" href="https://github.com/igjp-sample/AdventCalendar/blob/main/how_to_contribute_article.md" target="_blank">+</a>
+                </div>
+            </div>
+        }
+
     }
 
     <!-- Days 25 to 28 (Greyed out) -->
@@ -50,24 +74,95 @@
 </div>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        //var markdownFiles = await GetMarkdownFiles();
-    }
 
-    private async Task<List<string>> GetMarkdownFiles()
+    private Dictionary<int, Article> articles = new Dictionary<int, Article>();
+
+    protected override async Task OnInitializedAsync()
     {
         var client = HttpClient;
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request");
 
-        var response = await client.GetAsync("https://api.github.com/repos/igjp-sample/AdventCalendar/contents/content");
-        if (response.IsSuccessStatusCode)
+        var url = "https://api.github.com/repos/igjp-sample/AdventCalendar/contents/content";
+        var contents = await client.GetFromJsonAsync<List<GitHubContent>>(url);
+        if (contents != null)
         {
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<string>>(jsonResponse);
+            foreach (var content in contents)
+            {
+                if (content.Name != "template.md" && !string.IsNullOrEmpty(content.download_url))
+                {
+                    var fileContent = await client.GetStringAsync(content.download_url);
+                    // Markdown の2行目がタイトル
+                    var lines = fileContent.Split('\n');
+                    string title = "タイトル未設定";
+                    if (lines.Length > 1)
+                    {
+                        var getTitle = lines[1].Trim();
+                        if (getTitle.StartsWith("Title: "))
+                        {
+                            title = getTitle.Substring("Title: ".Length).Trim();
+                        }
+                    }
+
+                    // Markdown の3行目が公開ステータス
+                    string status = "Draft";
+                    if (lines.Length > 2)
+                    {
+                        var statusLine = lines[2].Trim();
+                        if (statusLine.StartsWith("Status (Draft or Publish): "))
+                        {
+                            status = statusLine.Substring("Status (Draft or Publish): ".Length).Trim();
+                        }
+                    }
+
+                    // 最後の編集者を取得
+                    var commitsUrl = $"https://api.github.com/repos/igjp-sample/AdventCalendar/commits?path={content.Path}";
+
+                    var commits = await client.GetFromJsonAsync<List<GitHubCommit>>(commitsUrl);
+                    string author = "著者不明";
+                    if (commits != null && commits.Count > 0)
+                    {
+                        var lastCommit = commits.First();
+                        author = lastCommit.Commit.Author.Name;
+                    }
+
+                    // 記事IDの生成 (x.md の x 部分を取得)
+                    if (int.TryParse(content.Name.Replace(".md", ""), out int articleId))
+                    {
+                        articles[articleId] = new Article { Title = title, Author = author, Status = status };
+                    }
+                }
+            }
+        }
+    }
+
+    public class Article
+    {
+        public string? Title { get; set; }
+        public string? Author { get; set; }
+        public string? Status { get; set; }
+    }
+
+    public class GitHubContent
+    {
+        public required string Name { get; set; }
+        public required string Path { get; set; }
+        public required string download_url { get; set; }
+    }
+
+    public class GitHubCommit
+    {
+        public required CommitInfo Commit { get; set; }
+
+        public class CommitInfo
+        {
+            public required AuthorInfo Author { get; set; }
         }
 
-        return new List<string>();
+        public class AuthorInfo
+        {
+            public required string Name { get; set; }
+            public required DateTime Date { get; set; }
+        }
     }
 
 }

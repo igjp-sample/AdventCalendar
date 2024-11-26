@@ -7,11 +7,11 @@
 }
 
 .day, .weekday {
-    padding: 10px 14px;
+    padding: 20px 12px 12px;
     border: 1px solid #ccc;
     font-size: 1em;
     background-color: #f9f9f9;
-    height: 120px;
+    min-height: 120px;
     width: 144px;
     position: relative;
 }
@@ -28,11 +28,13 @@
     height: 45px;
     font-size: 0.8em;
     text-align: center;
+    min-height: auto;
 }
 
 .day span {
     position: absolute;
-    top: 5px;
+    top: 2px;
+    font-size: 12px;
     left: 5px;
 }
 
@@ -88,6 +90,13 @@ h1::after {
     height: 100%;
 }
 
+.calendar-content.has-post {
+    display: block;
+    word-break: break-all;
+    line-height: 1.4;
+    font-size: 12px;
+}
+
 .how-to-contribute {
     text-decoration: none;
     color: #aaa;
@@ -99,4 +108,8 @@ h1::after {
     align-content: center;
     justify-content: center;
     align-items: center;
+}
+
+.calendar-content i a {
+    color: #333;
 }
