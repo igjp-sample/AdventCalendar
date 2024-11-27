@@ -34,40 +34,33 @@
             dayClass += " saturday";
         }
 
-        if (articles.ContainsKey(day))
-        {
-            var article = articles[day];
-            <div class="@dayClass">
-                <span>@day</span>
-                <div class="calendar-content has-post">
+        <div class="@dayClass">
+            <span>@day</span>
+            <div class="calendar-content @(articles.ContainsKey(day) ? "has-post" : "")">
+                @if (articles.ContainsKey(day))
+                {
+                    var article = articles[day];
                     <b>
-                        @if (article.Status == "Publish")
-                        {
-                            <a href="">@article.Title</a>
+                        @{
+                            var titleContent = (article.Status == "Publish")
+                            ? (MarkupString)$"<a href=\"/post/{day}\">{article.Title}</a>"
+                            : (MarkupString)article.Title;
                         }
-                        else
-                        {
-                            @article.Title
-                        }
+                        @titleContent
                     </b>
                     <i>by <a href="https://github.com/@article.Author" target="_blank">@@@article.Author</a></i>
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="@dayClass">
-                <span>@day</span>
-                <div class="calendar-content">
+                }
+                else
+                {
                     <a class="how-to-contribute" href="https://github.com/igjp-sample/AdventCalendar/blob/main/how_to_contribute_article.md" target="_blank">+</a>
-                </div>
+                }
             </div>
-        }
+        </div>
 
     }
 
     <!-- Days 25 to 28 (Greyed out) -->
-    <div class="day greyed-out"><span>25</span></div>
+    <div class="day greyed-out xmas"><span>25</span></div>
     <div class="day greyed-out"><span>26</span></div>
     <div class="day greyed-out"><span>27</span></div>
     <div class="day greyed-out"><span>28</span></div>

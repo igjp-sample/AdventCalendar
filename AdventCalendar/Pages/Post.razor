@@ -1,0 +1,38 @@
+﻿@page "/post/{day:int}"
+@using Markdig
+
+<div class="post-container">
+    @((MarkupString)content)
+</div>
+
+@code {
+
+    [Inject]
+    private HttpClient Http { get; set; } = default!;
+
+    [Parameter]
+    public int Day { get; set; }
+
+    private string content = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // GitHub raw リンクの組み立て
+            var url = $"https://raw.githubusercontent.com/igjp-sample/AdventCalendar/main/content/{Day}.md";
+
+            // Markdown ファイルを取得
+            var markdown = await Http.GetStringAsync(url);
+
+            // Markdig を使って HTML に変換
+            var pipeline = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            content = Markdig.Markdown.ToHtml(markdown, pipeline);
+        }
+        catch (Exception ex)
+        {
+            content = $"エラーが発生しました: {ex.Message}";
+        }
+    }
+
+}
