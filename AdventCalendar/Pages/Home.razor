@@ -43,7 +43,7 @@
                     <b>
                         @{
                             var titleContent = (article.Status == "Publish")
-                            ? (MarkupString)$"<a href=\"/post/{day}\">{article.Title}</a>"
+                            ? (MarkupString)$"<a href=\"./post/{day}\">{article.Title}</a>"
                             : (MarkupString)article.Title;
                         }
                         @titleContent
