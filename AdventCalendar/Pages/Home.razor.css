@@ -115,7 +115,7 @@ h1::after {
 }
 
 .xmas {
-    background: url(/images/xmas.jpg);
+    background: url(./images/xmas.jpg);
     background-size: cover;
     background-position: center;
 }
