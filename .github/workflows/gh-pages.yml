@@ -20,6 +20,23 @@ jobs:
       - name: Install .NET WebAssembly Tools
         run: dotnet workload install wasm-tools
 
+      # Read files in content directory and create JSON
+      - name: Generate JSON with file names and last committers
+        run: |
+          TARGET_DIR="content"
+          OUTPUT_FILE="public/wwwroot/committers.json"
+          echo "[]" > "$OUTPUT_FILE"
+          
+          # Read all files in content directory except those named 'template'
+          for file in $(find "$TARGET_DIR" -type f -not -name 'template*'); do
+            filename=$(basename "$file" .${file##*.})
+            last_committer=$(git log -1 --pretty=format:'%an' -- "$file")
+            
+            # Append JSON object to array
+            temp_json=$(jq -n --arg name "$filename" --arg committer "$last_committer" '{name: $name, committer: $committer}')
+            jq ". += [\$temp]" --argjson temp "$temp_json" "$OUTPUT_FILE" > temp_output.json && mv temp_output.json "$OUTPUT_FILE"
+          done
+
       # Publish the site
       - name: Publish
         run: dotnet publish AdventCalendar/AdventCalendar.csproj -p:GHPages=true -c:Release -o:public
