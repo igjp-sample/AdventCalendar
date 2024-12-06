@@ -35,6 +35,7 @@ jobs:
           for file in $(find "$TARGET_DIR" -type f -name '*.md' -not -name 'template*'); do
             filename=$(basename "$file" .${file##*.})
             last_committer=$(git log -1 --pretty=format:'%an' -- "$file")
+            echo "Last committer for $file: $last_committer"
             
             # Append JSON object to array
             temp_json=$(jq -n --arg name "$filename" --arg committer "$last_committer" '{name: $name, committer: $committer}')
