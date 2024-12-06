@@ -1,5 +1,6 @@
 ﻿@page "/post/{day:int}"
 @using Markdig
+@inject IJSRuntime JS
 
 <div class="post-container">
     @((MarkupString)content)
@@ -15,6 +16,14 @@
 
     private string content = string.Empty;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("applyPrism");
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -27,7 +36,12 @@
 
             // Markdig を使って HTML に変換
             var pipeline = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-            content = Markdig.Markdown.ToHtml(markdown, pipeline);
+            var document = Markdown.Parse(markdown, pipeline);
+
+            // カスタムパーサーを使って画像パスを書き換える
+            ImagePathRewriterExtension.RewriteImagePaths(document);
+
+            content = Markdig.Markdown.ToHtml(document, pipeline);
         }
         catch (Exception ex)
         {

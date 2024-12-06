@@ -1,17 +1,23 @@
-﻿.post-container {
+﻿.content {
+}
+
+.post-container {
     font-family: Arial, sans-serif;
     line-height: 1.8;
     color: #333;
+    padding-bottom: 3em;
 }
 
-.post-container h1, h2, h3 {
+.post-container ::deep h1,
+.post-container ::deep h2,
+.post-container ::deep h3 {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #222;
     line-height: 1.4;
     margin-bottom: 0.5em;
 }
 
-post-container h1 {
+.post-container ::deep h1 {
     font-size: 2.5em;
     font-weight: bold;
     border-bottom: 2px solid #ddd;
@@ -19,34 +25,34 @@ post-container h1 {
     margin-top: 1em;
 }
 
-.post-container h2 {
+.post-container ::deep h2 {
     font-size: 2em;
     font-weight: bold;
     margin-top: 2em;
 }
 
-.post-container h3 {
+.post-container ::deep h3 {
     font-size: 1.5em;
     font-weight: normal;
     margin-top: 1.5em;
 }
 
-.post-container p {
+.post-container ::deep p {
     font-size: 1.125em;
     margin-top: 2em;
     text-align: justify;
 }
 
-.post-container a {
+.post-container ::deep a {
     color: #1a0dab;
     text-decoration: none;
 }
 
-.post-container a:hover {
+.post-container ::deep a:hover {
     text-decoration: underline;
 }
 
-.post-container blockquote {
+.post-container ::deep blockquote {
     border-left: 4px solid #ccc;
     margin-left: 0;
     margin-right: 0;
@@ -56,7 +62,7 @@ post-container h1 {
     color: #555;
 }
 
-.post-container pre {
+.post-container ::deep pre {
     background: #272822;
     color: #f8f8f2;
     padding: 1em;
@@ -66,7 +72,7 @@ post-container h1 {
     line-height: 1.5;
 }
 
-.post-container code {
+.post-container ::deep code {
     background: #f2f2f2;
     color: #e83e8c;
     padding: 0.2em 0.4em;
@@ -74,43 +80,52 @@ post-container h1 {
     font-family: 'Courier New', Courier, monospace;
 }
 
-.post-container pre code {
+.post-container ::deep pre code {
     background: none;
     color: inherit;
     padding: 0;
 }
 
-.post-container ul, .post-container ol {
+.post-container ::deep ul, .post-container ::deep ol {
     padding-left: 2em;
     margin-bottom: 1.5em;
 }
 
-.post-container li {
+.post-container ::deep li {
     margin-bottom: 0.5em;
     font-size: 1.125em;
 }
 
-.post-container img {
+.post-container ::deep img {
     max-width: 100%;
     height: auto;
     margin: 1.5em 0;
     border-radius: 4px;
 }
 
-.post-container hr {
+.post-container ::deep hr {
     border: 0;
     height: 1px;
     background: #ccc;
     margin: 2em 0;
 }
 
-.post-container figcaption {
+.post-container ::deep figcaption {
     font-size: 0.9em;
     color: #555;
     text-align: center;
     margin-top: 0.5em;
 }
+
+.post-container ::deep hr:first-of-type {
+    display: none;
+}
+
+.post-container ::deep h2:first-of-type {
+    display: none;
+}
+
 .post-container {
-    max-width: 960px;
+    max-width: 860px;
     margin: 0 auto;
 }
