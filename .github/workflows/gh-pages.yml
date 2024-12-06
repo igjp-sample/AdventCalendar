@@ -31,10 +31,10 @@ jobs:
           OUTPUT_FILE="public/wwwroot/committers.json"
           echo "[]" > "$OUTPUT_FILE"
           
-          # Read all files in content directory except those named 'template'
-          for file in $(find "$TARGET_DIR" -type f -not -name 'template*'); do
+          # Read all .md files in content directory except those named 'template'
+          for file in $(find "$TARGET_DIR" -type f -name '*.md' -not -name 'template*'); do
             filename=$(basename "$file" .${file##*.})
-            last_committer=$(git log -1 --pretty=format:'%an' -- "$file")
+            last_committer=$(git log -1 --pretty=format:'%ae' -- "$file")
             
             # Append JSON object to array
             temp_json=$(jq -n --arg name "$filename" --arg committer "$last_committer" '{name: $name, committer: $committer}')
