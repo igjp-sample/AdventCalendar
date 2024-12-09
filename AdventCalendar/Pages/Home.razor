@@ -48,7 +48,7 @@
                         }
                         @titleContent
                     </b>
-                    <i>by <a href="https://github.com/@article.Author" target="_blank">@@@article.Author</a></i>
+                    <i>by @@@article.Author</i>
                 }
                 else
                 {
@@ -76,15 +76,17 @@
         var client = HttpClient;
         client.DefaultRequestHeaders.UserAgent.ParseAdd("request");
 
-        var url = "https://api.github.com/repos/igjp-sample/AdventCalendar/contents/content";
-        var contents = await client.GetFromJsonAsync<List<GitHubContent>>(url);
-        if (contents != null)
+        var url = "https://raw.githubusercontent.com/igjp-sample/AdventCalendar/refs/heads/gh-pages/committers.json";
+
+        try
         {
-            foreach (var content in contents)
+            var contents = await client.GetFromJsonAsync<List<GitHubContent>>(url);
+            if (contents != null)
             {
-                if (content.Name != "template.md" && !string.IsNullOrEmpty(content.download_url))
+                foreach (var content in contents)
                 {
-                    var fileContent = await client.GetStringAsync(content.download_url);
+                    var rowFileUrl = $"https://raw.githubusercontent.com/igjp-sample/AdventCalendar/main/content/{content.Name}.md";
+                    var fileContent = await client.GetStringAsync(rowFileUrl);
                     // Markdown の2行目がタイトル
                     var lines = fileContent.Split('\n');
                     string title = "タイトル未設定";
@@ -108,25 +110,27 @@
                         }
                     }
 
-                    // 最後の編集者を取得
-                    var commitsUrl = $"https://api.github.com/repos/igjp-sample/AdventCalendar/commits?path={content.Path}";
-
-                    var commits = await client.GetFromJsonAsync<List<GitHubCommit>>(commitsUrl);
-                    string author = "著者不明";
-                    if (commits != null && commits.Count > 0)
-                    {
-                        var lastCommit = commits.First();
-                        author = lastCommit.Commit.Author.Name;
-                    }
 
                     // 記事IDの生成 (x.md の x 部分を取得)
-                    if (int.TryParse(content.Name.Replace(".md", ""), out int articleId))
-                    {
-                        articles[articleId] = new Article { Title = title, Author = author, Status = status };
-                    }
+                    var articleId = int.Parse(content.Name);
+                    articles[articleId] = new Article { Title = title, Author = content.Committer, Status = status };
+
                 }
             }
         }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine($"Request error: {e.Message}");
+        }
+        catch (NotSupportedException e)
+        {
+            Console.WriteLine($"The content type is not supported: {e.Message}");
+        }
+        catch (JsonException e)
+        {
+            Console.WriteLine($"Invalid JSON format: {e.Message}");
+        }
+
     }
 
     public class Article
@@ -139,24 +143,7 @@
     public class GitHubContent
     {
         public required string Name { get; set; }
-        public required string Path { get; set; }
-        public required string download_url { get; set; }
-    }
-
-    public class GitHubCommit
-    {
-        public required CommitInfo Commit { get; set; }
-
-        public class CommitInfo
-        {
-            public required AuthorInfo Author { get; set; }
-        }
-
-        public class AuthorInfo
-        {
-            public required string Name { get; set; }
-            public required DateTime Date { get; set; }
-        }
+        public required string Committer { get; set; }
     }
 
 }
