@@ -16,11 +16,21 @@
 
     private string content = string.Empty;
 
+    private enum InitializingState
+    {
+        Loading,
+        BuiltContent,
+        SyntaxHighlighted
+    }
+
+    private InitializingState initializingState = InitializingState.Loading;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (initializingState == InitializingState.BuiltContent)
         {
-            await JS.InvokeVoidAsync("applyPrism");
+            initializingState = InitializingState.SyntaxHighlighted;
+            await JS.InvokeVoidAsync("Prism.highlightAll");
         }
     }
 
@@ -42,6 +52,7 @@
             ImagePathRewriterExtension.RewriteImagePaths(document);
 
             content = Markdig.Markdown.ToHtml(document, pipeline);
+            initializingState = InitializingState.BuiltContent;
         }
         catch (Exception ex)
         {
