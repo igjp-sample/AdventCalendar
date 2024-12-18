@@ -1,6 +1,20 @@
 ﻿.content {
 }
 
+.quick-nav-link {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    color: #aaa;
+}
+    .quick-nav-link a {
+        margin: 0;
+    }
+        .quick-nav-link a:not(:has(href)):hover {
+            text-decoration: none;
+        }
+
 .post-container {
     font-family: Arial, sans-serif;
     line-height: 1.8;

@@ -2,6 +2,14 @@
 @using Markdig
 @inject IJSRuntime JS
 
+<SectionContent SectionName="AppBar">
+    <div class="quick-nav-link">
+        <a href="@prevPostUrl">前の記事</a>
+        <span>|</span>
+        <a href="@nextPostUrl">次の記事</a>
+    </div>
+</SectionContent>
+
 <div class="post-container">
     @((MarkupString)content)
 </div>
@@ -15,6 +23,10 @@
     public int Day { get; set; }
 
     private string content = string.Empty;
+
+    private string? prevPostUrl;
+    
+    private string? nextPostUrl;
 
     private enum InitializingState
     {
@@ -36,6 +48,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // 前後の記事へのリンクを生成
+        prevPostUrl = Day > 1 ? $"/post/{Day - 1}" : null;
+        nextPostUrl = Day < 25 ? $"/post/{Day + 1}" : null;
+
         try
         {
             // GitHub raw リンクの組み立て
