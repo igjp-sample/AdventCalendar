@@ -51,8 +51,8 @@
         await base.OnParametersSetAsync();
 
         // 前後の記事へのリンクを生成
-        prevPostUrl = Day > 1 ? $"/post/{Day - 1}" : null;
-        nextPostUrl = Day < 25 ? $"/post/{Day + 1}" : null;
+        prevPostUrl = Day > 1 ? $"./post/{Day - 1}" : null;
+        nextPostUrl = Day < 25 ? $"./post/{Day + 1}" : null;
 
         try
         {
